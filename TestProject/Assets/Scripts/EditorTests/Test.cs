@@ -21,6 +21,21 @@ namespace EditorTests
             var target3 = new Entity(new Vector3(1, 1, 0), Vector3.right);
             Assert.IsTrue(FrontDetectUtils.IsInFront(observer, target3), $"{target} is not in front of {observer}");
         }
-    }
 
+        [Test]
+        public void Test_GameStateSwitch()
+        {
+            var manager = new GameStateManager();
+            Assert.IsTrue(manager.CurrentGameState is GameStateLobby, $"{manager.CurrentGameState.GetType()} is not GameStateLobby");
+            
+            manager.ChangeGameState(new GameStateEventBattleStart());
+            Assert.IsTrue(manager.CurrentGameState is GameStateBattle, $"{manager.CurrentGameState.GetType()} is not GameStateBattle");
+            
+            manager.ChangeGameState(new GameStateEventBattleEnd());
+            Assert.IsTrue(manager.CurrentGameState is GameStateBattleResult, $"{manager.CurrentGameState.GetType()} is not GameStateBattleResult");
+            
+            manager.ChangeGameState(new GameStateEventExitBattle());
+            Assert.IsTrue(manager.CurrentGameState is GameStateLobby, $"{manager.CurrentGameState.GetType()} is not GameStateLobby");
+        }
+    }
 }
