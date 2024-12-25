@@ -16,7 +16,7 @@ namespace Core.Three
         private RectTransform _targetRectTransform;
 
         [SerializeField]
-        private Canvas _canvas;
+        private RectTransform _parentRectTransform;
         
         [SerializeField]
         private GameObject _itemPrefab;
@@ -42,11 +42,13 @@ namespace Core.Three
         
         private Color _originalColor;
 
+        private Color _targetColor;
+
         public void DoAnimation(List<GameObject> items)
         {
             if (_items == null || items.Count <= 0) return;
 
-            var targetPosition = _canvas.transform.InverseTransformPoint(_targetRectTransform.position);
+            var targetPosition = _parentRectTransform.InverseTransformPoint(_targetRectTransform.position);
             var starObjects = new GameObject[items.Count];
             for (var i = 0; i < items.Count; i++)
             {
@@ -59,13 +61,13 @@ namespace Core.Three
                 var image = star.GetComponent<Image>();
                 image.color = _originalColor;
                 var position = item.transform.position;
-                rectTransform.localPosition = _canvas.transform.InverseTransformPoint(position);
+                rectTransform.localPosition = _parentRectTransform.InverseTransformPoint(position);
 
                 // animation
                 var sequence = DOTween.Sequence();
                 sequence.PrependInterval(_startInterval * i);
                 sequence.Append(rectTransform.DOLocalMove(targetPosition, _moveDuration).SetEase(_moveEase));
-                var t = DOTween.To(() => image.color, x => image.color = x, Color.clear, _fadeDuration)
+                var t = DOTween.To(() => image.color, x => image.color = x, _targetColor, _fadeDuration)
                     .SetEase(_fadeEase);
                 t.SetTarget(image);
                 sequence.Append(t);
@@ -75,13 +77,14 @@ namespace Core.Three
 
         private void Awake()
         {
-            if (_canvas == null || _targetRectTransform == null || _itemPrefab == null)
+            if (_parentRectTransform == null || _targetRectTransform == null || _itemPrefab == null)
             {
                 this.enabled = false;
             }
             
             _itemPool = new ObjectPool<GameObject>(CreateItem, null, ReleaseItem, DestroyItem);
             _originalColor = _itemPrefab.GetComponent<Image>().color;
+            _targetColor = new Color(_originalColor.r, _originalColor.g, _originalColor.b, 0);
         }
 
         private void ReleaseItem(GameObject obj)
@@ -92,7 +95,7 @@ namespace Core.Three
 
         private GameObject CreateItem()
         {
-            var go = Instantiate(_itemPrefab, _canvas.transform);
+            var go = Instantiate(_itemPrefab, _parentRectTransform);
             return go;
         }
 
