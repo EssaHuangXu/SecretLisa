@@ -1,4 +1,4 @@
-using System;
+using UnityEngine;
 
 namespace SecretLisa
 {
@@ -12,13 +12,13 @@ namespace SecretLisa
         public override void OnEnter()
         {
             base.OnEnter();
-            Console.Write("Wait for battle start!");
+            Debug.Log("Wait for battle start!");
         }
 
         public override void OnExit()
         {
             base.OnExit();
-            Console.Write("Lobby state exit");
+            Debug.Log("Lobby state exit");
         }
     }
 }

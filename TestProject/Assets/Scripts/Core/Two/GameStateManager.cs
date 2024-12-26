@@ -11,7 +11,9 @@ namespace SecretLisa
             var result = CurrentGameState.HandleEvent(@event);
             if (result != null)
             {
+                CurrentGameState.OnExit();
                 CurrentGameState = result;
+                CurrentGameState.OnEnter();
             }
         }
     }
